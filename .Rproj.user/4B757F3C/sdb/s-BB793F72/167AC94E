@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "### Process\n\nsimd = read.csv(\"../data/import/simd_lookup.csv\", stringsAsFactors = FALSE)\nsimd_mmw = right_join((simd %>% group_by(MMWcode) %>% \n                        summarize(health = mean(SIMD16_Health_Domain_Rank), population = sum(Population), working_pop = sum(Working_Age_Population_revised))),\n                      (simd %>% filter(!duplicated(MMWcode) & (LAname == \"City of Edinburgh\" | LAname == \"Midlothian\"| LAname==\"East Lothian\"| LAname==\"West Lothian\")) %>% \n                         mutate(MMWcode = as.character(MMWcode)) %>% select(MMWcode)), by=\"MMWcode\")\n                    \n\n### proj4 strings\n### figure out how to reproject\nlatlong = \"+init=epsg:4326\"\nukgrid = \"+init=epsg:27700\"\ngoogle = \"+init=epsg:3857\"\nosgb_36 = \"+init=epsg:4277\"\n\n### load spatial files\nmmw = readOGR(dsn = \"../data/import/All-Scottish-Census-boundaries(shp)/\", layer = \"WD_2011_EoR_Scotland\")\n\nscotland = readOGR(dsn = \"../data/import/\", layer = \"scotland_osgb\")\nscotland = spTransform(scotland, CRS(proj4string(mmw)))\n\n### subset edinburgh\nmmw_ed = mmw[grep(\"Lothian|lothian|Edinburgh\", mmw$CA_Name),]\n\n### join simd\nmmw_ed@data = left_join(mmw_ed@data, simd_mmw, by=c(\"GSS_CODEWD\" = \"MMWcode\"))\n\n### Add centroids to mmw edinburgh\nmmw_ed@data[,c(\"x\",\"y\")] = coordinates(gCentroid(mmw_ed,byid=TRUE))\n\n### disolve into one region for clipping later\nedinburgh = gUnaryUnion(mmw_ed, id=mmw_ed$local)\nedinburgh_clip = SpatialPolygons(edinburgh@polygons, proj4string= CRS(proj4string(mmw_ed)))\n\n### create points spdf\nmmw_ed_points = SpatialPointsDataFrame(coordinates(mmw_ed), mmw_ed@data, \n                                       proj4string = CRS(proj4string(mmw)))\n\n### now over to the tutorial - http://gis.stackexchange.com/questions/158021/plotting-map-resulted-from-kriging-in-r\n\n### compute the grid for our poly\nx_length = max(mmw_ed$x - min(mmw_ed$x))+30000\ny_length = max(mmw_ed$y - min(mmw_ed$y))+20000\n\n### pixel size\ncellsize = 100\n\n### columns\nncol = round(x_length/cellsize,0) #number of columns in grid\nnrow = round(y_length/cellsize,0) #number of rows in grid\n\n### already have coordinates for mmw_points\n\n### make grid\nmmw_grid = GridTopology(cellcentre.offset=c(min(mmw_ed$x)+500,min(mmw_ed$y))-10000, \n                        cellsize=c(cellsize,cellsize), cells.dim=c(ncol,nrow))\n\nmmw_grid_pixels = SpatialPixelsDataFrame(mmw_grid, data=data.frame(id=1:prod(ncol, nrow)),\n                                    proj4string = CRS(proj4string(mmw_ed)))\n\nmmw_grid_points = SpatialPointsDataFrame(mmw_grid, data=data.frame(id=1:prod(ncol, nrow)),\n                                         proj4string = CRS(proj4string(mmw_ed)))\n\n### clip the grid\nmmw_ed_grid_clipped = mmw_grid_points[!is.na(over(mmw_grid_points, edinburgh_clip)),]\n\n### Krigging\nkriging_result = autoKrige(scale(health)~1, mmw_ed_points, mmw_ed_grid_clipped, block=c(10,10), model=\"Exp\")\n\n### try interpolating the results\nmmw_interp = interp(x=kriging_result$krige_output, z=\"var1.pred\")\n\n### testing\nmmw_ed_points@data %>% \n  ggplot(aes(x, y)) + geom_point(aes(size=health), color=\"blue\", alpha=3/4) + \n  ggtitle(\"Health outcomes in Edinburgh by location\") +  coord_equal() + theme_bw()\n",
+    "created" : 1490641306573.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1182844700",
+    "id" : "167AC94E",
+    "lastKnownWriteTime" : 1490693521,
+    "last_content_update" : 1490693521399,
+    "path" : "~/www/simd_contour/rproj_simd/process.R",
+    "project_path" : "process.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

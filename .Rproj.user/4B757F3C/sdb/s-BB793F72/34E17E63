@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "### Init\n\nlibrary(\"dplyr\")\nlibrary(\"ggplot2\")\nlibrary(\"rgdal\")\nlibrary(\"plotly\")\nlibrary(\"raster\")\nlibrary(\"maptools\")\nlibrary(\"gpclib\")\n# library(\"rgl\")\nlibrary(\"rgeos\")\nlibrary(\"automap\")\nlibrary(\"akima\")\n\n\n### local lib\n\n### project files\nsource(\"import.R\")",
+    "created" : 1490473150966.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "272291095",
+    "id" : "34E17E63",
+    "lastKnownWriteTime" : 1490690327,
+    "last_content_update" : 1490690327680,
+    "path" : "~/www/simd_contour/rproj_simd/init.R",
+    "project_path" : "init.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

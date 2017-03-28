@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "### import\n\nimport_simd = function(){\n  simd = read.csv(\"../data/import/simd.csv\", stringsAsFactors = FALSE)\n  \n  return(list(simd=simd))\n}",
+    "created" : 1490473843128.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "690756463",
+    "id" : "805EE576",
+    "lastKnownWriteTime" : 1490562020,
+    "last_content_update" : 1490562020111,
+    "path" : "~/www/simd_contour/rproj_simd/import.R",
+    "project_path" : "import.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
